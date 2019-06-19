@@ -3,15 +3,15 @@
 #include <tinge.hpp>
 
 int main() {
+	// Show some styles.
 	tinge::println_h("\nstyles!");
-
 	tinge::noticeln("notice");
 	tinge::warnln("warn");
 	tinge::errorln("error");
 	tinge::successln("success");
 
 
-
+	// Show some colours.
 	tinge::println_h("\ncolours!");
 
 	tinge::println(
@@ -70,10 +70,10 @@ int main() {
 	);
 
 
+	// Showcase some formatting.
 	tinge::println_h("\nformatting!");
-
-	tinge::println_h("\ta ", "b ", "c");
-	tinge::println_em("\ta ", "b ", "c");
+	tinge::println_h("\theading: ", "a ", "b ", "c");   // Whole line is bold.
+	tinge::println_em("\temphasis: ", "a ", "b ", "c");  // First element is bold.
 
 	tinge::println();
 
