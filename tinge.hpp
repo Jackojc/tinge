@@ -479,6 +479,7 @@ namespace tinge {
 			return ""; // Check for 0.
 
 		std::string out = c;
+		out.reserve(c.size() * n);
 
 		for (n--; n > 0; n--)
 			out += c;
