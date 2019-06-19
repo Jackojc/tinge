@@ -1,11 +1,16 @@
 # tinge
-a simple, fast, header-only library for C++ which enables pretty colours on the terminal.
+**a simple, fast, header-only library for C++ which enables pretty colours on the terminal.**
 
-> Only supports terminals which have support for ANSI escape sequences.
+### Requirements
+- Only supports terminals which have support for ANSI escape sequences.
+- C++17 compiler needed.
+- Works on Linux and Windows 10.
 
+### Examples
 ![example1](pics/example1.png)
 
 
+### Code
 ```cpp
 #include <iostream>
 // #define TINGE_PLAIN
