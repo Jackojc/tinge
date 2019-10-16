@@ -313,11 +313,11 @@ namespace tinge {
 
 
 	namespace style {
-		inline detail::Normal  normal;
-		inline detail::Notice  notice;
-		inline detail::Warn    warn;
-		inline detail::Error   error;
-		inline detail::Success success;
+		constexpr detail::Normal  normal;
+		constexpr detail::Notice  notice;
+		constexpr detail::Warn    warn;
+		constexpr detail::Error   error;
+		constexpr detail::Success success;
 	}
 }
 
