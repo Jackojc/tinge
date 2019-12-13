@@ -386,13 +386,37 @@ namespace tinge {
 	}
 
 
+	template <typename T>
+	struct before {
+		const T& s;
+
+		before(const T& s_): s(s_) {}
+	};
+
+	template <typename T>
+	std::ostream& operator<<(std::ostream& os, const before<T>& s) {
+		return (os << s.s);
+	}
+
+
 	// Just output with no fancy formatting.
 	#define OUT(name, func) \
-		template <typename... Ts> inline std::ostream& name(Ts&&... args) { \
-			if constexpr(detail::FANCY) \
-				return tinge::func(tinge::style::name, detail::symbol::name, tinge::reset, std::forward<Ts&&>(args)...); \
-			else \
-				return tinge::func(detail::symbol::name, std::forward<Ts&&>(args)...); \
+		template <typename T, typename... Ts> inline std::ostream& name(T&& arg, Ts&&... args) { \
+			if constexpr(detail::FANCY) { \
+				if constexpr(std::is_same_v<T, tinge::before<T>>) \
+					return tinge::func( \
+						tinge::style::name, detail::symbol::name, tinge::reset, arg, std::forward<Ts&&>(args)... \
+					); \
+				else \
+					return tinge::func( \
+						arg, tinge::style::name, detail::symbol::name, tinge::reset, std::forward<Ts&&>(args)... \
+					); \
+			} else { \
+				if constexpr(std::is_same_v<T, tinge::before<T>>) \
+					return tinge::func(detail::symbol::name, std::forward<Ts&&>(args)...); \
+				else \
+					return tinge::func(arg, detail::symbol::name, std::forward<Ts&&>(args)...); \
+			} \
 		}
 
 	// Highlight first argument in bold, rest as normal.

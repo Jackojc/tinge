@@ -77,6 +77,11 @@ int main() {
 
 	tinge::println();
 
+	tinge::noticeln(tinge::before{"\t\t"}, "hey!");
+	tinge::warnln(tinge::before{tinge::tab(2)}, "hey!");
+	tinge::errorln(tinge::before{tinge::tab(2)}, "hey!");
+	tinge::successln(tinge::before{tinge::tab(2)}, "hey!");
+
 
 	return 0;
 }
