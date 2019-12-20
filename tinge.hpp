@@ -1,19 +1,11 @@
 #pragma once
 
 /*
-	todo:
-		- disable colours if system does not support ansi escape sequences
-		- check if dim bg colours are possible
-*/
-
-
-/*
-	FLAGS
-
-	TINGE_PRINT_OFF  disables print function
-	TINGE_ERR_OFF    disables err function
-	TINGE_LOG_OFF    disables log function
-	TINGE_PLAIN      disables all styles and colours
+	FLAGS:
+		TINGE_PRINT_OFF  disables print function
+		TINGE_ERR_OFF    disables err function
+		TINGE_LOG_OFF    disables log function
+		TINGE_PLAIN      disables all styles and colours
 */
 
 #include <iostream>
@@ -24,13 +16,21 @@
 #include <stdexcept>
 
 
-namespace tinge::detail {
-	#ifdef TINGE_PLAIN
-		constexpr auto FANCY = false;
-	#else
-		constexpr auto FANCY = true;
-	#endif
+
+// Exceptions.
+#define NEW_EXCEPTION_TYPE(name, default_msg)                                  \
+	struct name: public std::runtime_error {                                   \
+		template <typename... Ts>                                              \
+		name(Ts&&... args): std::runtime_error(((std::string{args}) + ...)) {} \
+		name(): std::runtime_error(default_msg) {}                             \
+	};                                                                         \
+
+namespace tinge::except {
+	NEW_EXCEPTION_TYPE(SetConsoleModeError, "could not set console mode!")
 }
+
+#undef NEW_EXCEPTION_TYPE
+
 
 
 // Platform specific stuff.
@@ -59,35 +59,16 @@ namespace tinge::detail {
 
 		// Kind of a neat trick, allows to run code before anything else in main when constructor is called.
 		// No need for any init functions.
-		Init init{};
+		inline Init init{};
 	}
+
 
 
 #elif defined(__unix__) || defined(__unix) || defined(__linux__) || defined(OS_LINUX)
 	#define OS_LINUX
-
 #elif defined(__APPLE__) || defined(__MACH__) || defined(OS_MAC)
 	#define OS_MAC
-
 #endif
-
-
-
-
-// Exceptions.
-#define NEW_EXCEPTION_TYPE(name, default_msg)                                  \
-	struct name: public std::runtime_error {                                   \
-		template <typename... Ts>                                              \
-		name(Ts&&... args): std::runtime_error(((std::string{args}) + ...)) {} \
-		name(): std::runtime_error(default_msg) {}                             \
-	};                                                                         \
-
-namespace tinge::except {
-	NEW_EXCEPTION_TYPE(SetConsoleModeError, "could not set console mode!")
-}
-
-#undef NEW_EXCEPTION_TYPE
-
 
 
 
@@ -240,80 +221,49 @@ namespace tinge {
 
 
 	// Styles.
-	namespace style {
-		#ifndef TINGE_PLAIN
-			constexpr auto reset   = "\033[0m";
-			constexpr auto bold    = "\033[1m";
-			constexpr auto reverse = "\033[7m";
-		#else
-			constexpr auto reset   = "";
-			constexpr auto bold    = "";
-			constexpr auto reverse = "";
-		#endif
-	}
+	#ifndef TINGE_PLAIN
+		constexpr auto bold    = "\033[1m";
+		constexpr auto reverse = "\033[7m";
+	#else
+		constexpr auto bold    = "";
+		constexpr auto reverse = "";
+	#endif
 
 
 	// Reset colours and style.
-	constexpr auto reset         = "\033[0;49;39m";
-	constexpr auto reset_colours = "\033[49;39m";
-	constexpr auto reset_styles  = "\033[0m";
+	constexpr auto reset        = "\033[0;49;39m";
+	constexpr auto reset_colour = "\033[49;39m";
+	constexpr auto reset_style  = "\033[0m";
 
 
 	// Presets.
 	namespace detail {
 		// Just used as tags.
-		struct Normal  {};
 		struct Notice  {};
 		struct Warn    {};
 		struct Error   {};
 		struct Success {};
 
 
-		inline std::ostream& operator<<(std::ostream& os, Normal) {
-			#ifndef TINGE_PLAIN
-				return (os << tinge::reset);
-			#else
-				return os;
-			#endif
-		}
-
+		// Overload operator<<
 		inline std::ostream& operator<<(std::ostream& os, Notice) {
-			#ifndef TINGE_PLAIN
-				return (os << tinge::style::bold << tinge::fg::white);
-			#else
-				return os;
-			#endif
+			return (os << tinge::bold << tinge::fg::white);
 		}
 
 		inline std::ostream& operator<<(std::ostream& os, Warn) {
-			#ifndef TINGE_PLAIN
-				return (os << tinge::style::bold << tinge::fg::blue);
-			#else
-				return os;
-			#endif
+			return (os << tinge::bold << tinge::fg::blue);
 		}
 
 		inline std::ostream& operator<<(std::ostream& os, Error) {
-			#ifndef TINGE_PLAIN
-				return (os << tinge::style::bold << tinge::fg::red);
-			#else
-				return os;
-			#endif
+			return (os << tinge::bold << tinge::fg::red);
 		}
 
 		inline std::ostream& operator<<(std::ostream& os, Success) {
-			#ifndef TINGE_PLAIN
-				return (os << tinge::style::bold << tinge::fg::green);
-			#else
-				return os;
-			#endif
+			return (os << tinge::bold << tinge::fg::green);
 		}
 
-	}
 
-
-	namespace style {
-		constexpr detail::Normal  normal;
+		// Instantiate.
 		constexpr detail::Notice  notice;
 		constexpr detail::Warn    warn;
 		constexpr detail::Error   error;
@@ -329,27 +279,17 @@ namespace tinge {
 	// Print to stdout.
 	template <typename... Ts> inline std::ostream& print(Ts&&... args) {
 		#ifndef TINGE_PRINT_OFF
-			#ifndef TINGE_PLAIN
-				return ((std::cout << tinge::reset) << ... << std::forward<Ts&&>(args)) << tinge::reset;
-			#else
-				return (std::cerr << ... << std::forward<Ts&&>(args));
-
-			#endif
+			return ((std::cout << tinge::reset) << ... << std::forward<Ts>(args)) << tinge::reset;
 		#else
 			return std::cout;
 		#endif
 	}
 
 
-	// Print to whatever clog is.
+	// Print to buffered stderr.
 	template <typename... Ts> inline std::ostream& log(Ts&&... args) {
 		#ifndef TINGE_LOG_OFF
-			#ifndef TINGE_PLAIN
-				return ((std::clog << tinge::reset) << ... << std::forward<Ts&&>(args)) << tinge::reset;
-			#else
-				return (std::cerr << ... << std::forward<Ts&&>(args));
-
-			#endif
+			return ((std::clog << tinge::reset) << ... << std::forward<Ts>(args)) << tinge::reset;
 		#else
 			return std::clog;
 		#endif
@@ -359,12 +299,7 @@ namespace tinge {
 	// Print to stderr.
 	template <typename... Ts> inline std::ostream& err(Ts&&... args) {
 		#ifndef TINGE_ERR_OFF
-			#ifndef TINGE_PLAIN
-				return ((std::cerr << tinge::reset) << ... << std::forward<Ts&&>(args)) << tinge::reset;
-			#else
-				return (std::cerr << ... << std::forward<Ts&&>(args));
-
-			#endif
+			return ((std::cerr << tinge::reset) << ... << std::forward<Ts>(args)) << tinge::reset;
 		#else
 			return std::cerr;
 		#endif
@@ -386,100 +321,109 @@ namespace tinge {
 	}
 
 
+	// Strong type to signal to the below functions that something should be printed before special symbol.
 	template <typename T>
 	struct before {
+		using value_type = T;
 		const T& s;
-
 		before(const T& s_): s(s_) {}
 	};
 
-	template <typename T>
-	std::ostream& operator<<(std::ostream& os, const before<T>& s) {
+	template <typename T> std::ostream& operator<<(std::ostream& os, const before<T>& s) {
 		return (os << s.s);
 	}
 
 
-	// Just output with no fancy formatting.
-	#define OUT(name, func) \
-		template <typename T, typename... Ts> inline std::ostream& name(T&& arg, Ts&&... args) { \
-			if constexpr(detail::FANCY) { \
-				if constexpr(std::is_same_v<T, tinge::before<T>>) \
-					return tinge::func( \
-						tinge::style::name, detail::symbol::name, tinge::reset, arg, std::forward<Ts&&>(args)... \
-					); \
-				else \
-					return tinge::func( \
-						arg, tinge::style::name, detail::symbol::name, tinge::reset, std::forward<Ts&&>(args)... \
-					); \
-			} else { \
-				if constexpr(std::is_same_v<T, tinge::before<T>>) \
-					return tinge::func(detail::symbol::name, std::forward<Ts&&>(args)...); \
-				else \
-					return tinge::func(arg, detail::symbol::name, std::forward<Ts&&>(args)...); \
-			} \
-		}
 
-	// Highlight first argument in bold, rest as normal.
-	#define OUTEM(name) \
-		template <typename T, typename... Ts> inline std::ostream& name##_em(T&& first, Ts&&... args) { \
-			if constexpr(detail::FANCY) \
-				return tinge::name(tinge::style::bold, std::forward<T&&>(first), tinge::reset, std::forward<Ts&&>(args)...); \
-			else \
-				return tinge::name(std::forward<T&&>(first), std::forward<Ts&&>(args)...); \
-		}
 
-	// Highlight all arguments in bold.
-	#define OUTH(name) \
-		template <typename... Ts> inline std::ostream& name##_h(Ts&&... args) { \
-			if constexpr(detail::FANCY) \
-				return tinge::name(tinge::style::bold, std::forward<Ts&&>(args)...); \
-			else \
-				return tinge::name(std::forward<Ts&&>(args)...); \
-		}
+
+	// fancy printing functions
+	template <typename T, typename... Ts> inline std::ostream& notice(T&& arg, Ts&&... args) {
+		return tinge::log(detail::notice, detail::symbol::notice, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+	}
+
+	template <typename T, typename... Ts> inline std::ostream& warn(T&& arg, Ts&&... args) {
+		return tinge::log(detail::warn, detail::symbol::warn, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+	}
+
+	template <typename T, typename... Ts> inline std::ostream& error(T&& arg, Ts&&... args) {
+		return tinge::err(detail::error, detail::symbol::error, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+	}
+
+	template <typename T, typename... Ts> inline std::ostream& success(T&& arg, Ts&&... args) {
+		return tinge::print(detail::success, detail::symbol::success, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+	}
 
 
 
 
-	// Same as OUT but newline appended.
-	#define OUTLN(name) \
-		template <typename... Ts> inline std::ostream& name##ln(Ts&&... args) { \
-			return tinge::name(std::forward<Ts&&>(args)..., '\n'); \
-		}
+	// const r-value ref
+	template <typename T, typename... Ts> inline std::ostream& notice(before<T>& arg, Ts&&... args) {
+		return tinge::log(arg, detail::notice, detail::symbol::notice, tinge::reset, std::forward<Ts>(args)...);
+	}
 
-	// Same as OUTEM but newline appended.
-	#define OUTEMLN(name) \
-		template <typename... Ts> inline std::ostream& name##ln_em(Ts&&... args) { \
-			return tinge::name##_em(std::forward<Ts&&>(args)..., '\n'); \
-		}
+	template <typename T, typename... Ts> inline std::ostream& warn(before<T>& arg, Ts&&... args) {
+		return tinge::log(arg, detail::warn, detail::symbol::warn, tinge::reset, std::forward<Ts>(args)...);
+	}
 
-	// Same as OUTH but newline appended.
-	#define OUTHLN(name) \
-		template <typename... Ts> inline std::ostream& name##ln_h(Ts&&... args) { \
-			return tinge::name##_h(std::forward<Ts&&>(args)..., '\n'); \
-		}
+	template <typename T, typename... Ts> inline std::ostream& error(before<T>& arg, Ts&&... args) {
+		return tinge::err(arg, detail::error, detail::symbol::error, tinge::reset, std::forward<Ts>(args)...);
+	}
 
+	template <typename T, typename... Ts> inline std::ostream& success(before<T>& arg, Ts&&... args) {
+		return tinge::print(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
+	}
 
 
-	// Expand all above macros for particular name.
-	#define ALL(name) \
-		OUTEM(name) \
-		OUTLN(name) \
-		OUTH(name) \
-		OUTEMLN(name) \
-		OUTHLN(name)
 
-	OUT(notice,  log)
-	OUT(warn,    log)
-	OUT(error,   err)
-	OUT(success, print)
+	// r-value overloads of above.
+	template <typename T, typename... Ts> inline std::ostream& notice(before<T>&& arg, Ts&&... args) {
+		return tinge::log(arg, detail::notice, detail::symbol::notice, tinge::reset, std::forward<Ts>(args)...);
+	}
 
-	ALL(print)
-	ALL(log)
-	ALL(err)
-	ALL(notice)
-	ALL(warn)
-	ALL(error)
-	ALL(success)
+	template <typename T, typename... Ts> inline std::ostream& warn(before<T>&& arg, Ts&&... args) {
+		return tinge::log(arg, detail::warn, detail::symbol::warn, tinge::reset, std::forward<Ts>(args)...);
+	}
+
+	template <typename T, typename... Ts> inline std::ostream& error(before<T>&& arg, Ts&&... args) {
+		return tinge::err(arg, detail::error, detail::symbol::error, tinge::reset, std::forward<Ts>(args)...);
+	}
+
+	template <typename T, typename... Ts> inline std::ostream& success(before<T>&& arg, Ts&&... args) {
+		return tinge::print(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
+	}
+
+
+
+
+	// Newline variants.
+	template <typename... Ts> inline std::ostream& println(Ts&&... args) {
+		return tinge::print(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& logln(Ts&&... args) {
+		return tinge::log(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& errln(Ts&&... args) {
+		return tinge::err(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& noticeln(Ts&&... args) {
+		return tinge::notice(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& warnln(Ts&&... args) {
+		return tinge::warn(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& errorln(Ts&&... args) {
+		return tinge::error(std::forward<Ts>(args)..., '\n');
+	}
+
+	template <typename... Ts> inline std::ostream& successln(Ts&&... args) {
+		return tinge::success(std::forward<Ts>(args)..., '\n');
+	}
 }
 
 
@@ -493,7 +437,6 @@ namespace tinge {
 			return std::string(n, c);
 		}
 	}
-
 
 
 	// std::string constructor does not allow repeating a string so
@@ -523,7 +466,4 @@ namespace tinge {
 		return details::repeat('\n', n);
 	}
 }
-
-
-
 
