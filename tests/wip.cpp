@@ -3,17 +3,6 @@
 #include <tinge.hpp>
 
 int main() {
-	// Show some styles.
-	tinge::println_h("\nstyles!");
-	tinge::noticeln("notice");
-	tinge::warnln("warn");
-	tinge::errorln("error");
-	tinge::successln("success");
-
-
-	// Show some colours.
-	tinge::println_h("\ncolours!");
-
 	tinge::println(
 		tinge::fg::dim::black,   "black ",
 		tinge::fg::dim::grey,    "grey ",
@@ -70,17 +59,23 @@ int main() {
 	);
 
 
-	// Showcase some formatting.
-	tinge::println_h("\nformatting!");
-	tinge::println_h("\theading: ", "a ", "b ", "c");   // Whole line is bold.
-	tinge::println_em("\temphasis: ", "a ", "b ", "c");  // First element is bold.
-
 	tinge::println();
 
-	tinge::noticeln(tinge::before{"\t\t"}, "hey!");
-	tinge::warnln(tinge::before{tinge::tab(2)}, "hey!");
-	tinge::errorln(tinge::before{tinge::tab(2)}, "hey!");
-	tinge::successln(tinge::before{tinge::tab(2)}, "hey!");
+	tinge::noticeln("a", "b", "c");
+	tinge::warnln("a", "b", "c");
+	tinge::errorln("a", "b", "c");
+	tinge::successln("a", "b", "c");
+
+	tinge::noticeln(tinge::before{tinge::tab(2)}, "a", "b", "c");
+	tinge::warnln(tinge::before{tinge::tab(2)}, "a", "b", "c");
+	tinge::errorln(tinge::before{tinge::tab(2)}, "a", "b", "c");
+	tinge::successln(tinge::before{tinge::tab(2)}, "a", "b", "c");
+
+	auto b = tinge::before{tinge::tab(2)};
+	tinge::noticeln(b, "a", "b", "c");
+	tinge::warnln(b, "a", "b", "c");
+	tinge::errorln(b, "a", "b", "c");
+	tinge::successln(b, "a", "b", "c");
 
 
 	return 0;
