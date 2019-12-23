@@ -351,7 +351,7 @@ namespace tinge {
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& success(T&& arg, Ts&&... args) {
-		return tinge::print(detail::success, detail::symbol::success, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+		return tinge::log(detail::success, detail::symbol::success, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
 	}
 
 
@@ -371,7 +371,7 @@ namespace tinge {
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& success(before<T>& arg, Ts&&... args) {
-		return tinge::print(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
+		return tinge::log(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
 	}
 
 
@@ -390,7 +390,7 @@ namespace tinge {
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& success(before<T>&& arg, Ts&&... args) {
-		return tinge::print(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
+		return tinge::log(arg, detail::success, detail::symbol::success, tinge::reset, std::forward<Ts>(args)...);
 	}
 
 
