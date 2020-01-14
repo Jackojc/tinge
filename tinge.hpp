@@ -74,152 +74,6 @@ namespace tinge::except {
 
 // Styles and colours.
 namespace tinge {
-	// Colours.
-	#ifndef TINGE_PLAIN
-		namespace fg {
-			constexpr auto reset   = "\033[39m";
-			constexpr auto grey    = "\033[38m";
-			constexpr auto gray    = tinge::fg::grey;
-			constexpr auto white   = "\033[37m";
-			constexpr auto cyan    = "\033[36m";
-			constexpr auto magenta = "\033[35m";
-			constexpr auto blue    = "\033[34m";
-			constexpr auto yellow  = "\033[33m";
-			constexpr auto green   = "\033[32m";
-			constexpr auto red     = "\033[31m";
-			constexpr auto black   = "\033[30m";
-
-			namespace bright {
-				constexpr auto reset   = tinge::fg::reset;
-				constexpr auto grey    = "\033[98m";
-				constexpr auto gray    = tinge::fg::bright::grey;
-				constexpr auto white   = "\033[97m";
-				constexpr auto cyan    = "\033[96m";
-				constexpr auto magenta = "\033[95m";
-				constexpr auto blue    = "\033[94m";
-				constexpr auto yellow  = "\033[93m";
-				constexpr auto green   = "\033[92m";
-				constexpr auto red     = "\033[91m";
-				constexpr auto black   = "\033[90m";
-			}
-
-			namespace dim {
-				constexpr auto reset   = tinge::fg::reset;
-				constexpr auto grey    = "\033[2;98m";
-				constexpr auto gray    = tinge::fg::dim::grey;
-				constexpr auto white   = "\033[2;97m";
-				constexpr auto cyan    = "\033[2;96m";
-				constexpr auto magenta = "\033[2;95m";
-				constexpr auto blue    = "\033[2;94m";
-				constexpr auto yellow  = "\033[2;93m";
-				constexpr auto green   = "\033[2;92m";
-				constexpr auto red     = "\033[2;91m";
-				constexpr auto black   = "\033[2;90m";
-			}
-		}
-
-		namespace bg {
-			constexpr auto reset   = "\033[49m";
-			constexpr auto grey    = "\033[48m";
-			constexpr auto gray    = tinge::bg::grey;
-			constexpr auto white   = "\033[47m";
-			constexpr auto cyan    = "\033[46m";
-			constexpr auto magenta = "\033[45m";
-			constexpr auto blue    = "\033[44m";
-			constexpr auto yellow  = "\033[43m";
-			constexpr auto green   = "\033[42m";
-			constexpr auto red     = "\033[41m";
-			constexpr auto black   = "\033[40m";
-
-			namespace bright {
-				constexpr auto reset   = tinge::bg::reset;
-				constexpr auto grey    = "\033[108m";
-				constexpr auto gray    = tinge::bg::bright::grey;
-				constexpr auto white   = "\033[107m";
-				constexpr auto cyan    = "\033[106m";
-				constexpr auto magenta = "\033[105m";
-				constexpr auto blue    = "\033[104m";
-				constexpr auto yellow  = "\033[103m";
-				constexpr auto green   = "\033[102m";
-				constexpr auto red     = "\033[101m";
-				constexpr auto black   = "\033[100m";
-			}
-		}
-
-	#else
-		namespace fg {
-			constexpr auto reset   = "";
-			constexpr auto grey    = "";
-			constexpr auto gray    = tinge::fg::grey;
-			constexpr auto white   = "";
-			constexpr auto cyan    = "";
-			constexpr auto magenta = "";
-			constexpr auto blue    = "";
-			constexpr auto yellow  = "";
-			constexpr auto green   = "";
-			constexpr auto red     = "";
-			constexpr auto black   = "";
-
-			namespace bright {
-				constexpr auto reset   = tinge::fg::reset;
-				constexpr auto grey    = "";
-				constexpr auto gray    = tinge::fg::bright::grey;
-				constexpr auto white   = "";
-				constexpr auto cyan    = "";
-				constexpr auto magenta = "";
-				constexpr auto blue    = "";
-				constexpr auto yellow  = "";
-				constexpr auto green   = "";
-				constexpr auto red     = "";
-				constexpr auto black   = "";
-			}
-
-			namespace dim {
-				constexpr auto reset   = tinge::fg::reset;
-				constexpr auto grey    = "";
-				constexpr auto gray    = tinge::fg::dim::grey;
-				constexpr auto white   = "";
-				constexpr auto cyan    = "";
-				constexpr auto magenta = "";
-				constexpr auto blue    = "";
-				constexpr auto yellow  = "";
-				constexpr auto green   = "";
-				constexpr auto red     = "";
-				constexpr auto black   = "";
-			}
-		}
-
-		namespace bg {
-			constexpr auto reset   = "";
-			constexpr auto grey    = "";
-			constexpr auto gray    = tinge::bg::grey;
-			constexpr auto white   = "";
-			constexpr auto cyan    = "";
-			constexpr auto magenta = "";
-			constexpr auto blue    = "";
-			constexpr auto yellow  = "";
-			constexpr auto green   = "";
-			constexpr auto red     = "";
-			constexpr auto black   = "";
-
-			namespace bright {
-				constexpr auto reset   = tinge::bg::reset;
-				constexpr auto grey    = "";
-				constexpr auto gray    = tinge::bg::bright::grey;
-				constexpr auto white   = "";
-				constexpr auto cyan    = "";
-				constexpr auto magenta = "";
-				constexpr auto blue    = "";
-				constexpr auto yellow  = "";
-				constexpr auto green   = "";
-				constexpr auto red     = "";
-				constexpr auto black   = "";
-			}
-		}
-	#endif
-
-
-
 	// Styles.
 	#ifndef TINGE_PLAIN
 		constexpr auto bold    = "\033[1m";
@@ -234,6 +88,253 @@ namespace tinge {
 	constexpr auto reset        = "\033[0;49;39m";
 	constexpr auto reset_colour = "\033[49;39m";
 	constexpr auto reset_style  = "\033[0m";
+
+
+
+	// Colours.
+	#ifndef TINGE_PLAIN
+		// Add ANSI escape sequences for colours to a string.
+		#define NEW_COLOUR_MAKER(name, colour) \
+			template <typename T> auto make_##name(const T& arg) { \
+				std::stringstream ss; \
+				ss << colour << arg << tinge::reset; \
+				return ss.str(); \
+			}
+
+		namespace fg {
+			constexpr auto grey    = "\033[38m";
+			constexpr auto white   = "\033[37m";
+			constexpr auto cyan    = "\033[36m";
+			constexpr auto magenta = "\033[35m";
+			constexpr auto blue    = "\033[34m";
+			constexpr auto yellow  = "\033[33m";
+			constexpr auto green   = "\033[32m";
+			constexpr auto red     = "\033[31m";
+			constexpr auto black   = "\033[30m";
+
+			NEW_COLOUR_MAKER(grey,    tinge::fg::grey)
+			NEW_COLOUR_MAKER(white,   tinge::fg::white)
+			NEW_COLOUR_MAKER(cyan,    tinge::fg::cyan)
+			NEW_COLOUR_MAKER(magenta, tinge::fg::magenta)
+			NEW_COLOUR_MAKER(blue,    tinge::fg::blue)
+			NEW_COLOUR_MAKER(yellow,  tinge::fg::yellow)
+			NEW_COLOUR_MAKER(green,   tinge::fg::green)
+			NEW_COLOUR_MAKER(red,     tinge::fg::red)
+			NEW_COLOUR_MAKER(black,   tinge::fg::black)
+
+			namespace bright {
+				constexpr auto grey    = "\033[98m";
+				constexpr auto white   = "\033[97m";
+				constexpr auto cyan    = "\033[96m";
+				constexpr auto magenta = "\033[95m";
+				constexpr auto blue    = "\033[94m";
+				constexpr auto yellow  = "\033[93m";
+				constexpr auto green   = "\033[92m";
+				constexpr auto red     = "\033[91m";
+				constexpr auto black   = "\033[90m";
+
+				NEW_COLOUR_MAKER(grey,    tinge::fg::bright::grey)
+				NEW_COLOUR_MAKER(white,   tinge::fg::bright::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::fg::bright::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::fg::bright::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::fg::bright::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::fg::bright::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::fg::bright::green)
+				NEW_COLOUR_MAKER(red,     tinge::fg::bright::red)
+				NEW_COLOUR_MAKER(black,   tinge::fg::bright::black)
+			}
+
+			namespace dim {
+				constexpr auto grey    = "\033[2;98m";
+				constexpr auto white   = "\033[2;97m";
+				constexpr auto cyan    = "\033[2;96m";
+				constexpr auto magenta = "\033[2;95m";
+				constexpr auto blue    = "\033[2;94m";
+				constexpr auto yellow  = "\033[2;93m";
+				constexpr auto green   = "\033[2;92m";
+				constexpr auto red     = "\033[2;91m";
+				constexpr auto black   = "\033[2;90m";
+
+				NEW_COLOUR_MAKER(grey,    tinge::fg::dim::grey)
+				NEW_COLOUR_MAKER(white,   tinge::fg::dim::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::fg::dim::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::fg::dim::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::fg::dim::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::fg::dim::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::fg::dim::green)
+				NEW_COLOUR_MAKER(red,     tinge::fg::dim::red)
+				NEW_COLOUR_MAKER(black,   tinge::fg::dim::black)
+			}
+		}
+
+		namespace bg {
+			constexpr auto reset   = "\033[49m";
+			constexpr auto grey    = "\033[48m";
+			constexpr auto white   = "\033[47m";
+			constexpr auto cyan    = "\033[46m";
+			constexpr auto magenta = "\033[45m";
+			constexpr auto blue    = "\033[44m";
+			constexpr auto yellow  = "\033[43m";
+			constexpr auto green   = "\033[42m";
+			constexpr auto red     = "\033[41m";
+			constexpr auto black   = "\033[40m";
+
+			NEW_COLOUR_MAKER(grey,    tinge::bg::grey)
+			NEW_COLOUR_MAKER(white,   tinge::bg::white)
+			NEW_COLOUR_MAKER(cyan,    tinge::bg::cyan)
+			NEW_COLOUR_MAKER(magenta, tinge::bg::magenta)
+			NEW_COLOUR_MAKER(blue,    tinge::bg::blue)
+			NEW_COLOUR_MAKER(yellow,  tinge::bg::yellow)
+			NEW_COLOUR_MAKER(green,   tinge::bg::green)
+			NEW_COLOUR_MAKER(red,     tinge::bg::red)
+			NEW_COLOUR_MAKER(black,   tinge::bg::black)
+
+			namespace bright {
+				constexpr auto grey    = "\033[108m";
+				constexpr auto white   = "\033[107m";
+				constexpr auto cyan    = "\033[106m";
+				constexpr auto magenta = "\033[105m";
+				constexpr auto blue    = "\033[104m";
+				constexpr auto yellow  = "\033[103m";
+				constexpr auto green   = "\033[102m";
+				constexpr auto red     = "\033[101m";
+				constexpr auto black   = "\033[100m";
+
+				NEW_COLOUR_MAKER(grey,    tinge::bg::bright::grey)
+				NEW_COLOUR_MAKER(white,   tinge::bg::bright::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::bg::bright::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::bg::bright::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::bg::bright::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::bg::bright::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::bg::bright::green)
+				NEW_COLOUR_MAKER(red,     tinge::bg::bright::red)
+				NEW_COLOUR_MAKER(black,   tinge::bg::bright::black)
+			}
+		}
+
+	#else
+		// Add ANSI escape sequences for colours to a string.
+		#define NEW_COLOUR_MAKER(name, colour) \
+			template <typename T> auto make_##name(const T& arg) { \
+				std::stringstream ss; \
+				ss << arg; \
+				return ss.str(); \
+			}
+
+		namespace fg {
+			constexpr auto reset   = "";
+			constexpr auto grey    = "";
+			constexpr auto white   = "";
+			constexpr auto cyan    = "";
+			constexpr auto magenta = "";
+			constexpr auto blue    = "";
+			constexpr auto yellow  = "";
+			constexpr auto green   = "";
+			constexpr auto red     = "";
+			constexpr auto black   = "";
+
+			NEW_COLOUR_MAKER(grey,    tinge::fg::grey)
+			NEW_COLOUR_MAKER(white,   tinge::fg::white)
+			NEW_COLOUR_MAKER(cyan,    tinge::fg::cyan)
+			NEW_COLOUR_MAKER(magenta, tinge::fg::magenta)
+			NEW_COLOUR_MAKER(blue,    tinge::fg::blue)
+			NEW_COLOUR_MAKER(yellow,  tinge::fg::yellow)
+			NEW_COLOUR_MAKER(green,   tinge::fg::green)
+			NEW_COLOUR_MAKER(red,     tinge::fg::red)
+			NEW_COLOUR_MAKER(black,   tinge::fg::black)
+
+			namespace bright {
+				constexpr auto grey    = "";
+				constexpr auto white   = "";
+				constexpr auto cyan    = "";
+				constexpr auto magenta = "";
+				constexpr auto blue    = "";
+				constexpr auto yellow  = "";
+				constexpr auto green   = "";
+				constexpr auto red     = "";
+				constexpr auto black   = "";
+
+				NEW_COLOUR_MAKER(grey,    tinge::fg::bright::grey)
+				NEW_COLOUR_MAKER(white,   tinge::fg::bright::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::fg::bright::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::fg::bright::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::fg::bright::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::fg::bright::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::fg::bright::green)
+				NEW_COLOUR_MAKER(red,     tinge::fg::bright::red)
+				NEW_COLOUR_MAKER(black,   tinge::fg::bright::black)
+			}
+
+			namespace dim {
+				constexpr auto grey    = "";
+				constexpr auto white   = "";
+				constexpr auto cyan    = "";
+				constexpr auto magenta = "";
+				constexpr auto blue    = "";
+				constexpr auto yellow  = "";
+				constexpr auto green   = "";
+				constexpr auto red     = "";
+				constexpr auto black   = "";
+
+				NEW_COLOUR_MAKER(grey,    tinge::fg::dim::grey)
+				NEW_COLOUR_MAKER(white,   tinge::fg::dim::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::fg::dim::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::fg::dim::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::fg::dim::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::fg::dim::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::fg::dim::green)
+				NEW_COLOUR_MAKER(red,     tinge::fg::dim::red)
+				NEW_COLOUR_MAKER(black,   tinge::fg::dim::black)
+			}
+		}
+
+		namespace bg {
+			constexpr auto grey    = "";
+			constexpr auto white   = "";
+			constexpr auto cyan    = "";
+			constexpr auto magenta = "";
+			constexpr auto blue    = "";
+			constexpr auto yellow  = "";
+			constexpr auto green   = "";
+			constexpr auto red     = "";
+			constexpr auto black   = "";
+
+			NEW_COLOUR_MAKER(grey,    tinge::bg::grey)
+			NEW_COLOUR_MAKER(white,   tinge::bg::white)
+			NEW_COLOUR_MAKER(cyan,    tinge::bg::cyan)
+			NEW_COLOUR_MAKER(magenta, tinge::bg::magenta)
+			NEW_COLOUR_MAKER(blue,    tinge::bg::blue)
+			NEW_COLOUR_MAKER(yellow,  tinge::bg::yellow)
+			NEW_COLOUR_MAKER(green,   tinge::bg::green)
+			NEW_COLOUR_MAKER(red,     tinge::bg::red)
+			NEW_COLOUR_MAKER(black,   tinge::bg::black)
+
+			namespace bright {
+				constexpr auto grey    = "";
+				constexpr auto white   = "";
+				constexpr auto cyan    = "";
+				constexpr auto magenta = "";
+				constexpr auto blue    = "";
+				constexpr auto yellow  = "";
+				constexpr auto green   = "";
+				constexpr auto red     = "";
+				constexpr auto black   = "";
+
+				NEW_COLOUR_MAKER(grey,    tinge::bg::bright::grey)
+				NEW_COLOUR_MAKER(white,   tinge::bg::bright::white)
+				NEW_COLOUR_MAKER(cyan,    tinge::bg::bright::cyan)
+				NEW_COLOUR_MAKER(magenta, tinge::bg::bright::magenta)
+				NEW_COLOUR_MAKER(blue,    tinge::bg::bright::blue)
+				NEW_COLOUR_MAKER(yellow,  tinge::bg::bright::yellow)
+				NEW_COLOUR_MAKER(green,   tinge::bg::bright::green)
+				NEW_COLOUR_MAKER(red,     tinge::bg::bright::red)
+				NEW_COLOUR_MAKER(black,   tinge::bg::bright::black)
+			}
+		}
+	#endif
+
+	#undef NEW_COLOUR_MAKER
+
 
 
 	// Presets.
@@ -425,7 +526,6 @@ namespace tinge {
 		return tinge::success(std::forward<Ts>(args)..., '\n');
 	}
 }
-
 
 
 

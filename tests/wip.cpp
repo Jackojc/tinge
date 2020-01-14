@@ -78,5 +78,13 @@ int main() {
 	tinge::successln(b, "a", "b", "c");
 
 
+	tinge::println(tinge::fg::make_red("hello"));
+	tinge::println(tinge::fg::make_blue("hello"));
+	tinge::println(tinge::fg::make_yellow("hello"));
+
+	tinge::println(tinge::bg::make_red("hello"));
+	tinge::println(tinge::bg::make_blue("hello"));
+	tinge::println(tinge::bg::make_yellow("hello"));
+
 	return 0;
 }
