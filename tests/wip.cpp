@@ -86,5 +86,9 @@ int main() {
 	tinge::println(tinge::bg::make_blue("hello"));
 	tinge::println(tinge::bg::make_yellow("hello"));
 
+
+	tinge::println(tinge::strcat(1, " ", 1, " ", 2, " ", 3));
+
+
 	return 0;
 }

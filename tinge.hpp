@@ -531,6 +531,24 @@ namespace tinge {
 
 // Utility functions.
 namespace tinge {
+	template <typename... Ts>
+	std::string strcat(Ts&&... args) {
+		std::string out;
+		out.reserve(sizeof...(Ts) * 5);
+
+		const auto to_str = [&out] (auto&& arg) {
+			std::stringstream ss;
+			ss << arg;
+			out += ss.str();
+		};
+
+		(to_str(std::forward<Ts>(args)), ...);
+
+		return out;
+	}
+
+
+
 	namespace details {
 		// unsafe, can be called like: repeat(5, 'n') or repeat('n', 5)
 		inline std::string repeat(char c, std::string::size_type n) {
