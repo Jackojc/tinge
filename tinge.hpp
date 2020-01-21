@@ -97,7 +97,7 @@ namespace tinge {
 		#define NEW_COLOUR_MAKER(name, colour) \
 			template <typename... Ts> auto make_##name(Ts&&... args) { \
 				std::stringstream ss; \
-				(ss << colour << ... << args) << tinge::reset; \
+				((ss << colour << args << tinge::reset), ...); \
 				return ss.str(); \
 			}
 
