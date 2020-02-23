@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 	FLAGS:
 		TINGE_PRINT_OFF  disables print function
@@ -48,9 +46,9 @@ namespace tinge::except {
 			Init() {
 				auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
-				if (handle != INVALID_HANDLE_VALUE and handle != nullptr) {
+				if (handle != INVALID_HANDLE_VALUE && handle != nullptr) {
 					if (DWORD original_mode; GetConsoleMode(handle, &original_mode) == TRUE)
-						return SetConsoleMode(handle, original_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+						SetConsoleMode(handle, original_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 				}
 
 				throw tinge::except::SetConsoleModeError();
@@ -560,7 +558,7 @@ namespace tinge {
 	// std::string constructor does not allow repeating a string so
 	// this function implements it.
 	inline std::string repeat(const std::string& c, std::string::size_type n) {
-		if (not n)
+		if (!n)
 			return ""; // Check for 0.
 
 		std::string out = c;
@@ -584,4 +582,3 @@ namespace tinge {
 		return details::repeat('\n', n);
 	}
 }
-
