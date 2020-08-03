@@ -6,6 +6,11 @@
 		TINGE_PLAIN      disables all styles and colours
 */
 
+#pragma once
+
+#ifndef TINGE_HPP
+#define TINGE_HPP
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -413,10 +418,10 @@ namespace tinge {
 namespace tinge {
 	// Symbols for special print functions.
 	namespace detail::symbol {
-		constexpr auto notice  = "[-] ";
-		constexpr auto warn    = "[*] ";
-		constexpr auto error   = "[!] ";
-		constexpr auto success = "[^] ";
+		constexpr auto notice  = "[-]";
+		constexpr auto warn    = "[*]";
+		constexpr auto error   = "[!]";
+		constexpr auto success = "[^]";
 	}
 
 
@@ -438,19 +443,19 @@ namespace tinge {
 
 	// fancy printing functions
 	template <typename T, typename... Ts> inline std::ostream& notice(T&& arg, Ts&&... args) {
-		return tinge::log(detail::notice, detail::symbol::notice, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+		return tinge::log(detail::notice, detail::symbol::notice, tinge::reset, " ", std::forward<T>(arg), std::forward<Ts>(args)...);
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& warn(T&& arg, Ts&&... args) {
-		return tinge::log(detail::warn, detail::symbol::warn, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+		return tinge::log(detail::warn, detail::symbol::warn, tinge::reset, " ", std::forward<T>(arg), std::forward<Ts>(args)...);
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& error(T&& arg, Ts&&... args) {
-		return tinge::err(detail::error, detail::symbol::error, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+		return tinge::err(detail::error, detail::symbol::error, tinge::reset, " ", std::forward<T>(arg), std::forward<Ts>(args)...);
 	}
 
 	template <typename T, typename... Ts> inline std::ostream& success(T&& arg, Ts&&... args) {
-		return tinge::log(detail::success, detail::symbol::success, tinge::reset, std::forward<T>(arg), std::forward<Ts>(args)...);
+		return tinge::log(detail::success, detail::symbol::success, tinge::reset, " ", std::forward<T>(arg), std::forward<Ts>(args)...);
 	}
 
 
@@ -497,31 +502,31 @@ namespace tinge {
 
 	// Newline variants.
 	template <typename... Ts> inline std::ostream& println(Ts&&... args) {
-		return tinge::print(std::forward<Ts>(args)..., '\n');
+		return tinge::print(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& logln(Ts&&... args) {
-		return tinge::log(std::forward<Ts>(args)..., '\n');
+		return tinge::log(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& errln(Ts&&... args) {
-		return tinge::err(std::forward<Ts>(args)..., '\n');
+		return tinge::err(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& noticeln(Ts&&... args) {
-		return tinge::notice(std::forward<Ts>(args)..., '\n');
+		return tinge::notice(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& warnln(Ts&&... args) {
-		return tinge::warn(std::forward<Ts>(args)..., '\n');
+		return tinge::warn(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& errorln(Ts&&... args) {
-		return tinge::error(std::forward<Ts>(args)..., '\n');
+		return tinge::error(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 
 	template <typename... Ts> inline std::ostream& successln(Ts&&... args) {
-		return tinge::success(std::forward<Ts>(args)..., '\n');
+		return tinge::success(std::forward<Ts>(args)..., tinge::reset, '\n');
 	}
 }
 
@@ -582,3 +587,5 @@ namespace tinge {
 		return details::repeat('\n', n);
 	}
 }
+
+#endif
