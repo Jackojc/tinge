@@ -502,31 +502,38 @@ namespace tinge {
 
 	// Newline variants.
 	template <typename... Ts> inline std::ostream& println(Ts&&... args) {
-		return tinge::print(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::print(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& logln(Ts&&... args) {
-		return tinge::log(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::log(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& errln(Ts&&... args) {
-		return tinge::err(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::err(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& noticeln(Ts&&... args) {
-		return tinge::notice(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::notice(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& warnln(Ts&&... args) {
-		return tinge::warn(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::warn(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& errorln(Ts&&... args) {
-		return tinge::error(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::error(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 
 	template <typename... Ts> inline std::ostream& successln(Ts&&... args) {
-		return tinge::success(std::forward<Ts>(args)..., tinge::reset, '\n');
+		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
+		return tinge::success(std::forward<Ts>(args)..., tinge::reset, ln);
 	}
 }
 
