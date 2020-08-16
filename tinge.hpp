@@ -433,7 +433,8 @@ namespace tinge {
 		before(const T& s_): s(s_) {}
 	};
 
-	template <typename T> std::ostream& operator<<(std::ostream& os, const before<T>& s) {
+	template <typename T>
+	inline std::ostream& operator<<(std::ostream& os, const before<T>& s) {
 		return (os << s.s);
 	}
 
@@ -542,19 +543,13 @@ namespace tinge {
 // Utility functions.
 namespace tinge {
 	template <typename... Ts>
-	std::string strcat(Ts&&... args) {
-		std::string out;
-		out.reserve(sizeof...(Ts) * 5);
+	inline std::string strcat(Ts&&... args) {
+		std::string buf{sizeof...(Ts), '\0'};
 
-		const auto to_str = [&out] (auto&& arg) {
-			std::stringstream ss;
-			ss << arg;
-			out += ss.str();
-		};
+		std::stringstream ss{buf};
+		((ss << std::forward<Ts>(args)), ...);
 
-		(to_str(std::forward<Ts>(args)), ...);
-
-		return out;
+		return ss.str();
 	}
 
 
