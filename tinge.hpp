@@ -16,62 +16,6 @@
 #include <sstream>
 #include <utility>
 #include <string>
-#include <stdexcept>
-
-
-
-// Exceptions.
-#define NEW_EXCEPTION_TYPE(name, default_msg)                                  \
-	struct name: public std::runtime_error {                                   \
-		template <typename... Ts>                                              \
-		name(Ts&&... args): std::runtime_error(((std::string{args}) + ...)) {} \
-		name(): std::runtime_error(default_msg) {}                             \
-	};                                                                         \
-
-namespace tinge::except {
-	NEW_EXCEPTION_TYPE(SetConsoleModeError, "could not set console mode!")
-}
-
-#undef NEW_EXCEPTION_TYPE
-
-
-
-// Platform specific stuff.
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(OS_WINDOWS)
-	#define OS_WINDOWS
-
-	#define WIN32_LEAN_AND_MEAN
-	extern "C" {
-		#include <windows.h>
-	}
-
-	// Ask console to use interpret ANSI escape sequences. (>=WIN10)
-	namespace tinge::detail {
-		struct Init {
-			Init() {
-				auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-				if (handle != INVALID_HANDLE_VALUE && handle != nullptr) {
-					if (DWORD original_mode; GetConsoleMode(handle, &original_mode) == TRUE)
-						SetConsoleMode(handle, original_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-				}
-
-				throw tinge::except::SetConsoleModeError();
-			}
-		};
-
-		// Kind of a neat trick, allows to run code before anything else in main when constructor is called.
-		// No need for any init functions.
-		inline Init init{};
-	}
-
-
-
-#elif defined(__unix__) || defined(__unix) || defined(__linux__) || defined(OS_LINUX)
-	#define OS_LINUX
-#elif defined(__APPLE__) || defined(__MACH__) || defined(OS_MAC)
-	#define OS_MAC
-#endif
 
 
 
@@ -350,19 +294,19 @@ namespace tinge {
 
 
 		// Overload operator<<
-		inline std::ostream& operator<<(std::ostream& os, Notice) {
+		inline std::ostream& operator<<(std::ostream& os, const Notice&) {
 			return (os << tinge::bold << tinge::fg::white);
 		}
 
-		inline std::ostream& operator<<(std::ostream& os, Warn) {
+		inline std::ostream& operator<<(std::ostream& os, const Warn&) {
 			return (os << tinge::bold << tinge::fg::blue);
 		}
 
-		inline std::ostream& operator<<(std::ostream& os, Error) {
+		inline std::ostream& operator<<(std::ostream& os, const Error&) {
 			return (os << tinge::bold << tinge::fg::red);
 		}
 
-		inline std::ostream& operator<<(std::ostream& os, Success) {
+		inline std::ostream& operator<<(std::ostream& os, const Success&) {
 			return (os << tinge::bold << tinge::fg::green);
 		}
 
@@ -430,7 +374,7 @@ namespace tinge {
 	struct before {
 		using value_type = T;
 		const T& s;
-		before(const T& s_): s(s_) {}
+		constexpr before(const T& s_): s(s_) {}
 	};
 
 	template <typename T>
@@ -502,39 +446,41 @@ namespace tinge {
 
 
 	// Newline variants.
+	namespace detail {
+		template <typename... Ts> inline auto ln() {
+			if constexpr(sizeof...(Ts) > 0)
+				return '\n';
+			else
+				return "";
+		}
+	}
+
 	template <typename... Ts> inline std::ostream& println(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::print(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::print(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& logln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::log(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::log(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& errln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::err(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::err(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& noticeln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::notice(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::notice(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& warnln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::warn(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::warn(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& errorln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::error(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::error(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 
 	template <typename... Ts> inline std::ostream& successln(Ts&&... args) {
-		constexpr auto ln = [] () { if constexpr(sizeof...(Ts) > 0) return '\n'; else return ""; } ();
-		return tinge::success(std::forward<Ts>(args)..., tinge::reset, ln);
+		return tinge::success(std::forward<Ts>(args)..., tinge::reset, detail::ln<Ts...>());
 	}
 }
 
@@ -554,7 +500,7 @@ namespace tinge {
 
 
 
-	namespace details {
+	namespace detail {
 		// unsafe, can be called like: repeat(5, 'n') or repeat('n', 5)
 		inline std::string repeat(char c, std::string::size_type n) {
 			return std::string(n, c);
@@ -578,15 +524,15 @@ namespace tinge {
 	}
 
 	inline std::string space(std::string::size_type n = 1) {
-		return details::repeat(' ', n);
+		return detail::repeat(' ', n);
 	}
 
 	inline std::string tab(std::string::size_type n = 1) {
-		return details::repeat('\t', n);
+		return detail::repeat('\t', n);
 	}
 
 	inline std::string line(std::string::size_type n = 1) {
-		return details::repeat('\n', n);
+		return detail::repeat('\n', n);
 	}
 }
 
