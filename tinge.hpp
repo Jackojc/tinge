@@ -162,7 +162,7 @@ namespace tinge {
 	#else
 		// Add ANSI escape sequences for colours to a string.
 		#define NEW_COLOUR_MAKER(name, colour) \
-			template <typename T> auto make_##name(const T& arg) { \
+			template <typename... Ts> auto make_##name(Ts&&... args) { \
 				std::stringstream ss; \
 				(ss << ... << args); \
 				return ss.str(); \
